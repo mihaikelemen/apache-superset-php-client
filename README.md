@@ -26,8 +26,6 @@ composer require mihaikelemen/apache-superset-php-client
 
 ## Quick Start
 
-### Basic Usage
-
 ```php
 <?php
 
@@ -35,205 +33,33 @@ require 'vendor/autoload.php';
 
 use Superset\SupersetFactory;
 
-// Create a client with authentication
+// Create an authenticated client
 $superset = SupersetFactory::createAuthenticated(
     baseUrl: 'https://your-superset-instance.com',
     username: 'your-username',
     password: 'your-password'
 );
 
-// Get all dashboards
+// Retrieve dashboards
 $dashboards = $superset->dashboard()->list();
 
-```
-
-### Manual Authentication
-
-```php
-<?php
-
-use Superset\SupersetFactory;
-
-// Create client without authentication
-$superset = SupersetFactory::create('https://your-superset-instance.com');
-
-// Authenticate manually
-$superset->auth()->authenticate('username', 'password');
-
-// Now you can make authenticated requests
+// Get a specific dashboard
 $dashboard = $superset->dashboard()->get('my-dashboard-slug');
 ```
 
-### Using Bearer Token
+## Documentation
 
-```php
-<?php
+For detailed usage instructions, authentication methods, and advanced configuration options, please refer to the [Usage Guide](docs/USAGE.md).
 
-use Superset\SupersetFactory;
+## Features
 
-$superset = SupersetFactory::create('https://your-superset-instance.com');
-
-// Set access token directly
-$superset->auth()->setAccessToken('your-bearer-token');
-
-// Make requests
-$dashboards = $superset->dashboard()->list();
-```
-
-## Usage Examples
-
-### Retrieving Dashboards
-
-#### Get a Single Dashboard
-
-```php
-<?php
-
-// By ID
-$dashboard = $superset->dashboard()->get('123');
-
-// By slug
-$dashboard = $superset->dashboard()->get('sales-dashboard');
-
-echo $dashboard->title;
-echo $dashboard->url;
-echo $dashboard->isPublished ? 'Published' : 'Draft';
-```
-
-#### Get All Dashboards
-
-```php
-<?php
-
-// Get all dashboards, regardless of their status
-$dashboards = $superset->dashboard()->list();
-
-// Get dashboards by tag
-$salesDashboards = $superset->dashboard()->list(tag: 'sales');
-
-// Include only published dashboards
-$allDashboards = $superset->dashboard()->list(onlyPublished: true);
-```
-
-#### Get Dashboard Embedded UUID
-
-```php
-<?php
-
-// Get UUID for embedding dashboard in an iframe
-$uuid = $superset->dashboard()->uuid('my-dashboard');
-```
-
-### Working with Guest Tokens
-
-```php
-<?php
-
-// Create a guest token for embedded dashboards
-$guestToken = $superset->auth()->createGuestToken(
-    userAttributes: [
-        'username' => 'guest_user',
-        'first_name' => 'Guest',
-        'last_name' => 'User',
-    ],
-    resources: [
-        'dashboard' => 'abc-def-123',
-    ],
-    rls: []
-);
-```
-
-### CSRF Token Handling
-
-```php
-<?php
-
-// Request CSRF token for all operations
-$csrfToken = $superset->auth()->requestCsrfToken();
-
-// The token is automatically added to subsequent requests
-$result = $superset->post('some/endpoint', ['data' => 'value']);
-```
-
-### Direct API Calls
-
-```php
-<?php
-
-// GET request
-$result = $superset->get('chart', ['q' => 'some-filter']);
-
-// POST request
-$result = $superset->post('dataset', [
-    'database' => 1,
-    'table_name' => 'my_table',
-]);
-
-// PUT request
-$result = $superset->put('dashboard/123', [
-    'dashboard_title' => 'Updated Title',
-]);
-
-// PATCH request
-$result = $superset->patch('chart/456', [
-    'viz_type' => 'bar',
-]);
-
-// DELETE request
-$result = $superset->delete('dashboard/123');
-```
-
-## Advanced Configuration
-
-### Custom HTTP Client
-
-```php
-<?php
-
-use Superset\Config\HttpClientConfig;
-use Superset\Http\HttpClient;
-use Superset\SupersetFactory;
-
-// Create a custom HTTP configuration
-$httpConfig = new HttpClientConfig(
-    baseUrl: 'https://your-superset-instance.com',
-    timeout: 60.0,
-    verifySsl: true,
-    maxRedirects: 5,
-    userAgent: 'MyApp/1.0'
-);
-
-// Use with factory
-$superset = SupersetFactory::createWithHttpClientConfig($httpConfig);
-```
-
-### Custom Headers
-
-```php
-<?php
-
-// Create HTTP client with custom headers that apply to all requests
-$httpClient = new HttpClient($httpConfig);
-$httpClient->addDefaultHeader('X-Custom-Header', 'value');
-```
-
-## API Coverage
-
-### Currently Implemented
-
-- Authentication (username/password, bearer token)
-- Guest token generation
-- CSRF token handling
-- Dashboard retrieval (single, multiple, filtered)
-- Dashboard embedded UUID
-- Generic HTTP methods (GET, POST, PUT, PATCH, DELETE)
-
-### Planned Features
-
-- Chart management
-- Dataset operations
-- User management
-- SQL Lab queries
+- Multiple authentication methods (username/password, bearer token)
+- Dashboard operations (list, retrieve, embed)
+- Guest token generation for embedded dashboards
+- CSRF token management
+- Direct API access for all HTTP methods
+- Configurable HTTP client settings
+- Logging support for debugging and monitoring
 
 ## Contributing
 
