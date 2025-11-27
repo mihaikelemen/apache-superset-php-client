@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## v1.1.2
 
+### Added
+- Usage documentation in `docs/USAGE.md`
+- Dashboard embedding example in `docs/example/dashboard.php`
+
 ### Changed
+- Simplified README.md quick start section, moved examples to usage guide
 - Updated repository references from `superset-php-client` to `apache-superset-php-client` across documentation
 - Migrated from deprecated `Symfony\Component\Serializer\Annotation\SerializedName` to `Symfony\Component\Serializer\Attribute\SerializedName` in `Dashboard` DTO
 
