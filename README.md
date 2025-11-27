@@ -1,10 +1,10 @@
 # Apache Superset PHP Client
 
-[![PHP Version](https://img.shields.io/packagist/php-v/mihaikelemen/superset-php-client)](https://packagist.org/packages/mihaikelemen/superset-php-client)
-[![Latest Version](https://img.shields.io/packagist/v/mihaikelemen/superset-php-client)](https://packagist.org/packages/mihaikelemen/superset-php-client)
-[![CI](https://github.com/mihaikelemen/superset-php-client/workflows/CI/badge.svg)](https://github.com/mihaikelemen/superset-php-client/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/mihaikelemen/superset-php-client/graph/badge.svg?token=XBBQEU4VUR)](https://codecov.io/gh/mihaikelemen/superset-php-client)
-[![License](https://img.shields.io/packagist/l/mihaikelemen/superset-php-client)](https://github.com/mihaikelemen/superset-php-client/blob/main/LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/mihaikelemen/apache-superset-php-client)](https://packagist.org/packages/mihaikelemen/apache-superset-php-client)
+[![Latest Version](https://img.shields.io/packagist/v/mihaikelemen/apache-superset-php-client)](https://packagist.org/packages/mihaikelemen/apache-superset-php-client)
+[![CI](https://github.com/mihaikelemen/apache-superset-php-client/workflows/CI/badge.svg)](https://github.com/mihaikelemen/apache-superset-php-client/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/mihaikelemen/apache-superset-php-client/graph/badge.svg?token=XBBQEU4VUR)](https://codecov.io/gh/mihaikelemen/apache-superset-php-client)
+[![License](https://img.shields.io/packagist/l/mihaikelemen/apache-superset-php-client)](https://github.com/mihaikelemen/apache-superset-php-client/blob/main/LICENSE)
 
 A PHP client library for interacting with the [Apache Superset API](https://superset.apache.org/docs/api/).
 
@@ -13,7 +13,7 @@ A PHP client library for interacting with the [Apache Superset API](https://supe
 Install the library using Composer:
 
 ```bash
-composer require mihaikelemen/superset-php-client
+composer require mihaikelemen/apache-superset-php-client
 ```
 
 ## Requirements
