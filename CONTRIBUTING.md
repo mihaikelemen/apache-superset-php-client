@@ -7,8 +7,8 @@ Contributions are welcome and help make this library better for everyone.
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/superset-php-client.git
-   cd superset-php-client
+   git clone https://github.com/YOUR-USERNAME/apache-superset-php-client.git
+   cd apache-superset-php-client
    ```
 3. Install dependencies:
    ```bash
@@ -198,8 +198,8 @@ I cannot guarantee that all feature requests will be implemented, but to suggest
 
 If you have questions about contributing:
 
-- Open a [GitHub Discussion](https://github.com/mihaikelemen/superset-php-client/discussions)
-- Create an [issue](https://github.com/mihaikelemen/superset-php-client/issues) for bugs
+- Open a [GitHub Discussion](https://github.com/mihaikelemen/apache-superset-php-client/discussions)
+- Create an [issue](https://github.com/mihaikelemen/apache-superset-php-client/issues) for bugs
 - Check existing documentation in README.md
 
 ## Code of Conduct

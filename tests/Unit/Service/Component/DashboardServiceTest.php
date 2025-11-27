@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Superset\Tests\Unit\Service;
+namespace Superset\Tests\Unit\Service\Component;
 
 use Superset\Config\ApiConfig;
 use Superset\Config\SerializerConfig;
