@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.2
+
+### Changed
+- Updated repository references from `superset-php-client` to `apache-superset-php-client` across documentation
+- Migrated from deprecated `Symfony\Component\Serializer\Annotation\SerializedName` to `Symfony\Component\Serializer\Attribute\SerializedName` in `Dashboard` DTO
+
+### Fixed
+- Corrected namespace declaration in `DashboardServiceTest` to match actual directory structure (`Superset\Tests\Unit\Service\Component`)
+
 ## v1.1.1
 
 ### Changed
