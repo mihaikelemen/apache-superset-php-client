@@ -20,7 +20,7 @@ final readonly class DashboardService
         $this->httpClient->addDefaultHeader('Referer', $this->urlBuilder->baseUrl);
     }
 
-    public function get(string $identity): Dashboard
+    public function get(int|string $identity): Dashboard
     {
         $url = $this->urlBuilder->build("dashboard/{$identity}");
         $response = $this->httpClient->get($url);
@@ -35,7 +35,7 @@ final readonly class DashboardService
         return $this->serializer->hydrate($result, Dashboard::class);
     }
 
-    public function uuid(string $identity): string
+    public function uuid(int|string $identity): string
     {
         $url = $this->urlBuilder->build("dashboard/{$identity}/embedded");
         $response = $this->httpClient->get($url);

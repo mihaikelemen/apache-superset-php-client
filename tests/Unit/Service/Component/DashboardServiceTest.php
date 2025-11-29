@@ -26,6 +26,8 @@ final class DashboardServiceTest extends BaseTestCase
     private UrlBuilder $urlBuilder;
     private SerializerService $serializer;
 
+    public const UUID = 'a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(HttpClientInterface::class);
@@ -46,7 +48,7 @@ final class DashboardServiceTest extends BaseTestCase
         $this->assertTrue($reflection->isReadOnly());
     }
 
-    public function testGetReturnsHydratedDashboard(): void
+    public function testGetReturnsHydratedDashboardWithStringIdentity(): void
     {
         $dashboardData = [
             'id' => 123,
@@ -69,6 +71,29 @@ final class DashboardServiceTest extends BaseTestCase
         $this->assertSame('test-dashboard', $dashboard->slug);
     }
 
+    public function testGetReturnsHydratedDashboardWithIntIdentity(): void
+    {
+        $dashboardData = [
+            'id' => 123,
+            'dashboard_title' => 'Another Dashboard',
+            'slug' => 'another-dashboard',
+            'published' => false,
+        ];
+
+        $this->httpClient
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->buildUrl('api/v1/dashboard/123'))
+            ->willReturn(['result' => $dashboardData]);
+
+        $dashboard = $this->dashboard()->get(123);
+
+        $this->assertInstanceOf(Dashboard::class, $dashboard);
+        $this->assertSame(123, $dashboard->id);
+        $this->assertSame('Another Dashboard', $dashboard->title);
+        $this->assertSame('another-dashboard', $dashboard->slug);
+    }
+
     public function testGetThrowsExceptionWhenResultMissing(): void
     {
         $this->httpClient
@@ -78,7 +103,7 @@ final class DashboardServiceTest extends BaseTestCase
 
         $this->expectExceptionWithMessage(
             UnexpectedRuntimeException::class,
-            "Dashboard data not found in response for dashboard identifier 'invalid-id'"
+            $this->errorMessage('invalid-id')
         );
 
         $this->dashboard()->get('invalid-id');
@@ -93,23 +118,52 @@ final class DashboardServiceTest extends BaseTestCase
 
         $this->expectExceptionWithMessage(
             UnexpectedRuntimeException::class,
-            "Dashboard data not found in response for dashboard identifier '999'"
+            $this->errorMessage(123)
         );
 
-        $this->dashboard()->get('999');
+        $this->dashboard()->get(123);
     }
 
-    public function testUuidReturnsUuidString(): void
+    public function testUuidReturnsUuidStringWithIntIdentity(): void
     {
         $this->httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/123/embedded'))
-            ->willReturn(['result' => ['uuid' => 'abc-123-def-456']]);
+            ->willReturn(['result' => ['uuid' => self::UUID]]);
 
-        $uuid = $this->dashboard()->uuid('123');
+        $uuid = $this->dashboard()->uuid(123);
 
-        $this->assertSame('abc-123-def-456', $uuid);
+        $this->assertSame(self::UUID, $uuid);
+    }
+
+    public function testUuidReturnsUuidStringWithStringIdentity(): void
+    {
+        $this->httpClient
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->buildUrl('api/v1/dashboard/test-slug/embedded'))
+            ->willReturn(['result' => ['uuid' => self::UUID]]);
+
+        $uuid = $this->dashboard()->uuid('test-slug');
+
+        $this->assertSame(self::UUID, $uuid);
+    }
+
+    public function testUuidReturnsValidV4Uuid(): void
+    {
+        $this->httpClient
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->buildUrl('api/v1/dashboard/123/embedded'))
+            ->willReturn(['result' => ['uuid' => self::UUID]]);
+
+        $uuid = $this->dashboard()->uuid(123);
+
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $uuid
+        );
     }
 
     public function testUuidThrowsExceptionWhenResultMissing(): void
@@ -121,10 +175,10 @@ final class DashboardServiceTest extends BaseTestCase
 
         $this->expectExceptionWithMessage(
             UnexpectedRuntimeException::class,
-            "Dashboard UUID not found in response for dashboard identifier '456'"
+            $this->errorMessage(123, 'UUID')
         );
 
-        $this->dashboard()->uuid('456');
+        $this->dashboard()->uuid(123);
     }
 
     public function testUuidThrowsExceptionWhenUuidMissing(): void
@@ -136,10 +190,10 @@ final class DashboardServiceTest extends BaseTestCase
 
         $this->expectExceptionWithMessage(
             UnexpectedRuntimeException::class,
-            "Dashboard UUID not found in response for dashboard identifier '789'"
+            $this->errorMessage('slug', 'UUID')
         );
 
-        $this->dashboard()->uuid('789');
+        $this->dashboard()->uuid('slug');
     }
 
     public function testUuidThrowsExceptionWhenUuidNotString(): void
@@ -147,14 +201,14 @@ final class DashboardServiceTest extends BaseTestCase
         $this->httpClient
             ->expects($this->once())
             ->method('get')
-            ->willReturn(['result' => ['uuid' => 123]]);
+            ->willReturn(['result' => ['uuid' => 456]]);
 
         $this->expectExceptionWithMessage(
             UnexpectedRuntimeException::class,
-            "Dashboard UUID not found in response for dashboard identifier 'bad'"
+            $this->errorMessage(123, 'UUID')
         );
 
-        $this->dashboard()->uuid('bad');
+        $this->dashboard()->uuid(123);
     }
 
     public function testListReturnsArrayOfDashboards(): void
@@ -296,5 +350,10 @@ final class DashboardServiceTest extends BaseTestCase
         $this->assertSame('First', $dashboards[0]->title);
         $this->assertSame('Second', $dashboards[1]->title);
         $this->assertSame('Third', $dashboards[2]->title);
+    }
+
+    private function errorMessage(int|string $identity, string $type = 'data'): string
+    {
+        return \sprintf("Dashboard %s not found in response for dashboard identifier '%s'", $type, $identity);
     }
 }
