@@ -58,6 +58,9 @@ final class Dashboard
 
         #[SerializedName('is_managed_externally')]
         public ?bool $isManagedExternally = null,
+
+        #[SerializedName('uuid')]
+        public ?string $uuid = null,
     ) {
     }
 }
