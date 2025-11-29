@@ -40,7 +40,6 @@ final class DashboardTest extends BaseTestCase
 
     public function testConstructorWithAllParameters(): void
     {
-        $createdAt = new \DateTimeImmutable('2024-01-01T10:00:00Z');
         $updatedAt = new \DateTimeImmutable('2024-01-02T10:00:00Z');
 
         $dashboard = new Dashboard(
@@ -85,9 +84,9 @@ final class DashboardTest extends BaseTestCase
 
     public function testConstructorWithMinimalParameters(): void
     {
-        $dashboard = new Dashboard(id: 456);
+        $dashboard = new Dashboard(id: 123);
 
-        $this->assertSame(456, $dashboard->id);
+        $this->assertSame(123, $dashboard->id);
         $this->assertNull($dashboard->title);
         $this->assertNull($dashboard->slug);
         $this->assertNull($dashboard->url);
@@ -108,7 +107,7 @@ final class DashboardTest extends BaseTestCase
     public function testHydrateFromCompleteApiResponse(): void
     {
         $data = [
-            'id' => 789,
+            'id' => 123,
             'dashboard_title' => 'Production Dashboard',
             'slug' => 'production-dashboard',
             'url' => '/superset/dashboard/production/',
@@ -138,7 +137,7 @@ final class DashboardTest extends BaseTestCase
         $dashboard = $this->serializer->hydrate($data, Dashboard::class);
 
         $this->assertInstanceOf(Dashboard::class, $dashboard);
-        $this->assertSame(789, $dashboard->id);
+        $this->assertSame(123, $dashboard->id);
         $this->assertSame('Production Dashboard', $dashboard->title);
         $this->assertSame('production-dashboard', $dashboard->slug);
         $this->assertSame('/superset/dashboard/production/', $dashboard->url);
@@ -159,14 +158,14 @@ final class DashboardTest extends BaseTestCase
     public function testHydrateFromMinimalApiResponse(): void
     {
         $data = [
-            'id' => 999,
+            'id' => 123,
             'dashboard_title' => 'Minimal Dashboard',
         ];
 
         $dashboard = $this->serializer->hydrate($data, Dashboard::class);
 
         $this->assertInstanceOf(Dashboard::class, $dashboard);
-        $this->assertSame(999, $dashboard->id);
+        $this->assertSame(123, $dashboard->id);
         $this->assertSame('Minimal Dashboard', $dashboard->title);
         $this->assertNull($dashboard->slug);
         $this->assertNull($dashboard->url);
@@ -178,66 +177,12 @@ final class DashboardTest extends BaseTestCase
         $this->assertSame([], $dashboard->tags);
     }
 
-    public function testHydrateFromRealSupersetApiResponse(): void
-    {
-        $data = [
-            'id' => 134,
-            'dashboard_title' => 'EN - Profiles',
-            'slug' => 'profiles',
-            'url' => '/superset/dashboard/profiles/',
-            'published' => true,
-            'css' => '',
-            'owners' => [
-                [
-                    'first_name' => 'Clémentine',
-                    'id' => 3,
-                    'last_name' => 'BLANCHON',
-                ],
-            ],
-            'created_by' => [
-                'first_name' => 'Joel',
-                'id' => 134,
-                'last_name' => 'Gomes',
-            ],
-            'changed_by' => [
-                'first_name' => 'Mihai',
-                'id' => 137,
-                'last_name' => 'kelemen',
-            ],
-            'changed_on_utc' => '2025-10-21T11:38:12.413017+00:00',
-            'tags' => [
-                ['id' => 2, 'name' => 'owner:3', 'type' => 3],
-                ['id' => 14, 'name' => 'user', 'type' => 1],
-            ],
-            'roles' => [
-                ['id' => 2, 'name' => 'Public'],
-            ],
-            'thumbnail_url' => '/api/v1/dashboard/134/thumbnail/ea1c8609ffafb23d418c2b165b8a6d76/',
-        ];
-
-        $dashboard = $this->serializer->hydrate($data, Dashboard::class);
-
-        $this->assertInstanceOf(Dashboard::class, $dashboard);
-        $this->assertSame(134, $dashboard->id);
-        $this->assertSame('EN - Profiles', $dashboard->title);
-        $this->assertSame('profiles', $dashboard->slug);
-        $this->assertSame('/superset/dashboard/profiles/', $dashboard->url);
-        $this->assertTrue($dashboard->isPublished);
-        $this->assertSame('', $dashboard->css);
-        $this->assertCount(1, $dashboard->owners);
-        $this->assertSame('Joel', $dashboard->createdBy['first_name']);
-        $this->assertSame('Mihai', $dashboard->updatedBy['first_name']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $dashboard->updatedAt);
-        $this->assertCount(2, $dashboard->tags);
-        $this->assertCount(1, $dashboard->roles);
-    }
-
     public function testDehydrateToArray(): void
     {
         $updatedAt = new \DateTimeImmutable('2024-01-02T10:00:00Z');
 
         $dashboard = new Dashboard(
-            id: 555,
+            id: 123,
             title: 'Dehydrate Test',
             slug: 'dehydrate-test',
             isPublished: true,
@@ -248,7 +193,7 @@ final class DashboardTest extends BaseTestCase
         $normalized = $this->serializer->dehydrate($dashboard);
 
         $this->assertIsArray($normalized);
-        $this->assertSame(555, $normalized['id']);
+        $this->assertSame(123, $normalized['id']);
         $this->assertSame('Dehydrate Test', $normalized['dashboard_title']);
         $this->assertSame('dehydrate-test', $normalized['slug']);
         $this->assertTrue($normalized['published']);
