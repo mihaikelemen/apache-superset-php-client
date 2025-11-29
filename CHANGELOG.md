@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.3
+
+### Changed
+- Improved README.md description with clearer library purpose
+- Clarified guest token and CSRF handling explanations in USAGE.md
+- Corrected code examples in USAGE.md (dashboard ID type, variable naming consistency)
+- `DashboardService::get()` and `DashboardService::uuid()` now accept both `int` and `string` identifiers
+
+### Fixed
+- Fixed typos and wording inconsistencies across documentation files
+- Corrected acknowledgments section to better reflect library dependencies
+- Refactored test suite to remove redundant tests and improve maintainability
+
 ## v1.1.2
 
 ### Added
