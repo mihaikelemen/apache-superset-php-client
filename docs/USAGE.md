@@ -67,7 +67,7 @@ Dashboards can be retrieved by ID or slug:
 <?php
 
 // Retrieve by numeric ID
-$dashboard = $supersetClient->dashboard()->get('123');
+$dashboard = $supersetClient->dashboard()->get(123);
 
 // Retrieve by slug identifier
 $dashboard = $supersetClient->dashboard()->get('sales-dashboard');
@@ -80,7 +80,7 @@ echo $dashboard->isPublished ? 'Published' : 'Draft';
 
 ### Listing Dashboards
 
-Retrieve multiple dashboards with optional filtering:
+Retrieve a list of dashboards with optional filtering by tag or publication status. It will include all the dashboards that are subject to the authenticated user's permissions.
 
 ```php
 <?php
@@ -103,7 +103,7 @@ $taggedPublished = $supersetClient->dashboard()->list(
 
 ### Getting Dashboard Embedded UUID
 
-Retrieve the UUID required for embedding a dashboard in an iframe:
+Retrieve the UUID needed for iframe embedding by using a dashboard's ID or slug identifier.
 
 ```php
 <?php
@@ -113,7 +113,7 @@ $uuid = $supersetClient->dashboard()->uuid('my-dashboard');
 
 ## Guest Token Management
 
-Generate guest tokens for embedded dashboard access without requiring user authentication:
+Generate guest tokens for embedding dashboard in external applications through iframes:
 
 ```php
 <?php
@@ -133,7 +133,7 @@ $guestToken = $supersetClient->auth()->createGuestToken(
 
 ## CSRF Token Handling
 
-The library handles CSRF token management for protected operations:
+When embedding dashboards a CSRF token is required. Once requested, the token is automatically included in subsequent requests.
 
 ```php
 <?php
@@ -147,7 +147,7 @@ $result = $supersetClient->post('some/endpoint', ['data' => 'value']);
 
 ## Direct API Calls
 
-The client provides methods for all standard HTTP operations.
+The superset client provides methods for direct API access using standard HTTP methods.
 
 ### GET Request
 
@@ -190,7 +190,7 @@ $result = $supersetClient->delete('dashboard/123');
 
 ### Custom HTTP Client Configuration
 
-Configure the HTTP client with specific settings:
+Configure your HTTP client with specific settings:
 
 ```php
 <?php
@@ -206,12 +206,12 @@ $httpConfig = new HttpClientConfig(
     userAgent: 'MyApp/1.0'
 );
 
-$supersetClientClient = SupersetFactory::createWithHttpClientConfig($httpConfig);
+$supersetClient = SupersetFactory::createWithHttpClientConfig($httpConfig);
 ```
 
 ### Custom Headers
 
-Add default headers that apply to all requests:
+Add default headers that apply consecutively to all requests once set:
 
 ```php
 <?php
@@ -239,15 +239,15 @@ $loggerConfig = new LoggerConfig(
     logPath: '/path/to/application.log'
 );
 
-$supersetClientClient = SupersetFactory::create(
+$supersetClient = SupersetFactory::create(
     baseUrl: 'https://your-superset-instance.com',
     logger: (new LoggerService($loggerConfig))->get()
 );
 ```
 
-#### HTTP Debug Logging
+#### Complete logging configuration
 
-Enable Guzzle's debug logging to inspect raw HTTP traffic:
+Enable Guzzle's debug logging to inspect raw HTTP traffic and Monolog for application-level logs:
 
 ```php
 <?php
@@ -266,7 +266,7 @@ $loggerConfig = new LoggerConfig(
     logPath: '/path/to/application.log'
 );
 
-$supersetClientClient = SupersetFactory::createWithHttpClientConfig(
+$supersetClient = SupersetFactory::createWithHttpClientConfig(
     httpConfig: $httpConfig,
     logger: (new LoggerService($loggerConfig))->get()
 );

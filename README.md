@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/mihaikelemen/apache-superset-php-client/graph/badge.svg?token=XBBQEU4VUR)](https://codecov.io/gh/mihaikelemen/apache-superset-php-client)
 [![License](https://img.shields.io/packagist/l/mihaikelemen/apache-superset-php-client)](https://github.com/mihaikelemen/apache-superset-php-client/blob/main/LICENSE)
 
-A PHP client library for interacting with the [Apache Superset API](https://superset.apache.org/docs/api/).
+A PHP client library for interacting with the [Apache Superset API](https://superset.apache.org/docs/api/). This library provides an easy-to-use interface for authenticating, retrieving dashboards, and managing embedded content.
 
 ## Installation
 
@@ -49,7 +49,7 @@ $dashboard = $superset->dashboard()->get('my-dashboard-slug');
 
 ## Documentation
 
-For detailed usage instructions, authentication methods, and advanced configuration options, please refer to the [Usage Guide](docs/USAGE.md).
+For detailed usage instructions, authentication methods, and advanced configuration options, please refer to the [USAGE.md](docs/USAGE.md).
 
 ## Features
 
@@ -71,6 +71,6 @@ This library is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Built for [Apache Superset](https://superset.apache.org/)
-- Uses [GuzzleHTTP](https://github.com/guzzle/guzzle) for HTTP client
+- Uses [GuzzleHTTP](https://github.com/guzzle/guzzle) as the HTTP client
 - Uses [Symfony Serializer](https://symfony.com/doc/current/components/serializer.html) for data transformation
+- Uses [Monolog](https://github.com/Seldaek/monolog) for logging
