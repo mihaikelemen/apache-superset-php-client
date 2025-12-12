@@ -19,6 +19,8 @@ final class DashboardTest extends BaseTestCase
 {
     private SerializerService $serializer;
 
+    public const UUID = 'a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+
     protected function setUp(): void
     {
         $this->serializer = SerializerService::create(new SerializerConfig());
@@ -61,7 +63,8 @@ final class DashboardTest extends BaseTestCase
             ],
             roles: [['id' => 1, 'name' => 'Admin']],
             thumbnail: '/thumbnail.png',
-            isManagedExternally: false
+            isManagedExternally: false,
+            uuid: self::UUID
         );
 
         $this->assertSame(123, $dashboard->id);
@@ -80,6 +83,10 @@ final class DashboardTest extends BaseTestCase
         $this->assertCount(1, $dashboard->roles);
         $this->assertSame('/thumbnail.png', $dashboard->thumbnail);
         $this->assertFalse($dashboard->isManagedExternally);
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $dashboard->uuid
+        );
     }
 
     public function testConstructorWithMinimalParameters(): void
@@ -102,6 +109,7 @@ final class DashboardTest extends BaseTestCase
         $this->assertSame([], $dashboard->roles);
         $this->assertNull($dashboard->thumbnail);
         $this->assertNull($dashboard->isManagedExternally);
+        $this->assertNull($dashboard->uuid);
     }
 
     public function testHydrateFromCompleteApiResponse(): void
@@ -132,6 +140,7 @@ final class DashboardTest extends BaseTestCase
             ],
             'thumbnail_url' => '/api/v1/dashboard/789/thumbnail/xyz789/',
             'is_managed_externally' => true,
+            'uuid' => self::UUID,
         ];
 
         $dashboard = $this->serializer->hydrate($data, Dashboard::class);
@@ -153,6 +162,7 @@ final class DashboardTest extends BaseTestCase
         $this->assertCount(2, $dashboard->roles);
         $this->assertSame('/api/v1/dashboard/789/thumbnail/xyz789/', $dashboard->thumbnail);
         $this->assertTrue($dashboard->isManagedExternally);
+        $this->assertSame(self::UUID, $dashboard->uuid);
     }
 
     public function testHydrateFromMinimalApiResponse(): void
@@ -175,6 +185,7 @@ final class DashboardTest extends BaseTestCase
         $this->assertNull($dashboard->updatedBy);
         $this->assertNull($dashboard->updatedAt);
         $this->assertSame([], $dashboard->tags);
+        $this->assertNull($dashboard->uuid);
     }
 
     public function testDehydrateToArray(): void
@@ -206,7 +217,7 @@ final class DashboardTest extends BaseTestCase
     {
         $reflection = new \ReflectionClass(Dashboard::class);
 
-        foreach (['id', 'title', 'slug', 'url', 'isPublished', 'css', 'position', 'metadata', 'owners', 'createdBy', 'updatedBy', 'updatedAt', 'tags', 'roles', 'thumbnail', 'isManagedExternally'] as $propertyName) {
+        foreach (['id', 'title', 'slug', 'url', 'isPublished', 'css', 'position', 'metadata', 'owners', 'createdBy', 'updatedBy', 'updatedAt', 'tags', 'roles', 'thumbnail', 'isManagedExternally', 'uuid'] as $propertyName) {
             $property = $reflection->getProperty($propertyName);
             $this->assertTrue($property->isPublic());
         }
@@ -220,7 +231,7 @@ final class DashboardTest extends BaseTestCase
         $this->assertNotNull($constructor);
 
         $parameters = $constructor->getParameters();
-        $this->assertCount(16, $parameters);
+        $this->assertCount(17, $parameters);
 
         $this->assertSame('id', $parameters[0]->getName());
         $this->assertSame('title', $parameters[1]->getName());
@@ -238,5 +249,6 @@ final class DashboardTest extends BaseTestCase
         $this->assertSame('roles', $parameters[13]->getName());
         $this->assertSame('thumbnail', $parameters[14]->getName());
         $this->assertSame('isManagedExternally', $parameters[15]->getName());
+        $this->assertSame('uuid', $parameters[16]->getName());
     }
 }
