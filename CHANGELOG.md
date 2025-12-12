@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.4
+
+### Added
+- `uuid` property to `Dashboard` DTO for dashboard unique identifier support
+
+### Fixed
+- Test suite now properly validates `uuid` property in Dashboard constructor and serialization tests
+
 ## v1.1.3
 
 ### Changed
