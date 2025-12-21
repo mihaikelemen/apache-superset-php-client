@@ -8,6 +8,7 @@ updates:
   - package-ecosystem: "composer" # See documentation for possible values
     directory: "/" # Location of package manifests
     target-branch: "main"
-    labels: "php dependencies"
+    labels: 
+      - "php dependencies"
     schedule:
       interval: "weekly"
