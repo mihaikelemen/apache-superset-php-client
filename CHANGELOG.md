@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.5
+
+### Changed
+- Upgraded PHPUnit from 10.5.58 to 12.5.4
+- Updated PHPStan from 2.1.32 to 2.1.33
+- Bumped PHP-CS-Fixer from 3.90.0 to 3.92.3
+
+### Fixed
+- Refactored test suite for PHPUnit 12 compatibility
+
 ## v1.1.4
 
 ### Added
