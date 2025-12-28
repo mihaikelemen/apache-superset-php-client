@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Exception;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Exception\AbstractException;
 use Superset\Exception\AuthenticationException;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group exception
- *
- * @covers \Superset\Exception\AuthenticationException
- */
+#[CoversClass(AuthenticationException::class)]
+#[Group('unit')]
+#[Group('exception')]
 final class AuthenticationExceptionTest extends BaseTestCase
 {
     public function testExtendsAbstractException(): void

@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Exception;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Superset\Exception\AbstractException;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group exception
- *
- * @covers \Superset\Exception\AbstractException
- */
+#[CoversClass(AbstractException::class)]
+#[Group('unit')]
+#[Group('exception')]
 final class AbstractExceptionTest extends BaseTestCase
 {
     public function testExtendsStandardException(): void

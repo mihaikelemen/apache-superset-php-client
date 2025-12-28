@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Service\Component;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\GuestUserConfig;
 use Superset\Service\Component\GuestUserService;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group service
- *
- * @covers \Superset\Service\Component\GuestUserService
- */
+#[CoversClass(GuestUserService::class)]
+#[Group('unit')]
+#[Group('service')]
 final class GuestUserServiceTest extends BaseTestCase
 {
     public function testConstructorWithDefaultValues(): void

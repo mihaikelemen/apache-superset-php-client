@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Auth;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Auth\AuthenticationService;
 use Superset\Config\ApiConfig;
 use Superset\Exception\AuthenticationException;
@@ -12,26 +14,22 @@ use Superset\Http\UrlBuilder;
 use Superset\Service\Component\GuestUserService;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group auth
- *
- * @covers \Superset\Auth\AuthenticationService
- */
+#[CoversClass(AuthenticationService::class)]
+#[Group('unit')]
+#[Group('auth')]
 final class AuthenticationServiceTest extends BaseTestCase
 {
-    private HttpClientInterface $httpClient;
     private UrlBuilder $urlBuilder;
 
     protected function setUp(): void
     {
-        $this->httpClient = $this->createMock(HttpClientInterface::class);
         $this->urlBuilder = new UrlBuilder(self::BASE_URL, new ApiConfig());
     }
 
     public function testCanBeInstantiated(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
         $this->assertInstanceOf(AuthenticationService::class, $authService);
     }
@@ -69,7 +67,8 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testInitialStateAllTokensAreNull(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
         $this->assertNull($authService->getAccessToken());
         $this->assertNull($authService->getCsrfToken());
@@ -78,16 +77,18 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testIsAuthenticatedReturnsFalseInitially(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
         $this->assertFalse($authService->isAuthenticated());
     }
 
     public function testSetAccessTokenStoresToken(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('addDefaultHeader')
             ->with('Authorization', 'Bearer test-token');
@@ -100,9 +101,10 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testSetAccessTokenAddsAuthorizationHeader(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('addDefaultHeader')
             ->with('Authorization', 'Bearer my-access-token');
@@ -112,9 +114,10 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testIsAuthenticatedReturnsTrueAfterSettingToken(): void
     {
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('addDefaultHeader');
 
@@ -125,7 +128,9 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testAuthenticateCallsHttpClientWithCorrectParameters(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->with(
@@ -140,12 +145,12 @@ final class AuthenticationServiceTest extends BaseTestCase
             )
             ->willReturn(['access_token' => 'test-access-token']);
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('addDefaultHeader')
             ->with('Authorization', 'Bearer test-access-token');
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->authenticate('testuser', 'testpass');
 
         $this->assertSame('test-access-token', $authService->getAccessToken());
@@ -154,7 +159,9 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testAuthenticateThrowsExceptionWhenNoAccessToken(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->willReturn([]);
@@ -164,13 +171,15 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Authentication failed: No access_token received'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->authenticate('user', 'pass');
     }
 
     public function testAuthenticateThrowsExceptionWhenAccessTokenNotString(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->willReturn(['access_token' => 12345]);
@@ -180,13 +189,15 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Authentication failed: No access_token received'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->authenticate('user', 'pass');
     }
 
     public function testRequestCsrfTokenCallsHttpClientWithCorrectParameters(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with(
@@ -196,12 +207,12 @@ final class AuthenticationServiceTest extends BaseTestCase
             )
             ->willReturn(['result' => 'csrf-token-value']);
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('addDefaultHeader')
             ->with('X-CSRFToken', 'csrf-token-value');
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $token = $authService->requestCsrfToken();
 
         $this->assertSame('csrf-token-value', $token);
@@ -210,7 +221,9 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testRequestCsrfTokenThrowsExceptionWhenNoResult(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn([]);
@@ -220,13 +233,15 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Failed to get CSRF token'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->requestCsrfToken();
     }
 
     public function testRequestCsrfTokenThrowsExceptionWhenResultNotString(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => 123]);
@@ -236,12 +251,13 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Failed to get CSRF token'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->requestCsrfToken();
     }
 
     public function testCreateGuestTokenCallsHttpClientWithCorrectParameters(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
         $userAttributes = ['username' => 'jhondoe', 'first_name' => 'John'];
         $resources = ['dashboard' => 'abc-123', 'chart' => 'xyz-789'];
         $rls = [['clause' => 'user_id = 1']];
@@ -257,7 +273,7 @@ final class AuthenticationServiceTest extends BaseTestCase
             'username' => 'jhondoe',
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->with(
@@ -271,7 +287,7 @@ final class AuthenticationServiceTest extends BaseTestCase
             )
             ->willReturn(['token' => 'guest-token-value']);
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $token = $authService->createGuestToken($userAttributes, $resources, $rls);
 
         $this->assertSame('guest-token-value', $token);
@@ -280,6 +296,7 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testCreateGuestTokenWithNoGuestUserAttributesDefinedAndEmptyRls(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
         $resources = ['dashboard' => 'test-id'];
 
         $expectedUserAttributes = [
@@ -288,7 +305,7 @@ final class AuthenticationServiceTest extends BaseTestCase
             'username' => 'Guest_User',
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->with(
@@ -302,7 +319,7 @@ final class AuthenticationServiceTest extends BaseTestCase
             )
             ->willReturn(['token' => 'guest-token']);
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $token = $authService->createGuestToken([], $resources);
 
         $this->assertSame('guest-token', $token);
@@ -311,7 +328,9 @@ final class AuthenticationServiceTest extends BaseTestCase
 
     public function testCreateGuestTokenThrowsExceptionWhenNoToken(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->willReturn([]);
@@ -321,13 +340,15 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Authentication failed: No token received'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->createGuestToken(['username' => 'guest'], ['dashboard' => 'id']);
     }
 
     public function testCreateGuestTokenThrowsExceptionWhenTokenNotString(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('post')
             ->willReturn(['token' => null]);
@@ -337,7 +358,7 @@ final class AuthenticationServiceTest extends BaseTestCase
             'Authentication failed: No token received'
         );
 
-        $authService = new AuthenticationService($this->httpClient, $this->urlBuilder);
+        $authService = new AuthenticationService($httpClient, $this->urlBuilder);
         $authService->createGuestToken(['username' => 'guest'], ['dashboard' => 'id']);
     }
 }
