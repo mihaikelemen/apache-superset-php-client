@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Auth\AuthenticationService;
 use Superset\Config\HttpClientConfig;
 use Superset\Http\Contracts\HttpClientInterface;
@@ -12,12 +14,9 @@ use Superset\Superset;
 use Superset\SupersetFactory;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group factory
- *
- * @covers \Superset\SupersetFactory
- */
+#[CoversClass(SupersetFactory::class)]
+#[Group('unit')]
+#[Group('factory')]
 final class SupersetFactoryTest extends BaseTestCase
 {
     public function testIsFinalClass(): void

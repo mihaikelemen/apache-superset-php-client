@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Http;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\ApiConfig;
 use Superset\Http\UrlBuilder;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group http
- *
- * @covers \Superset\Http\UrlBuilder
- */
+#[CoversClass(UrlBuilder::class)]
+#[Group('unit')]
+#[Group('http')]
 final class UrlBuilderTest extends BaseTestCase
 {
     private UrlBuilder $urlBuilder;

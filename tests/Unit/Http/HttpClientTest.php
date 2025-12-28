@@ -7,18 +7,17 @@ namespace Superset\Tests\Unit\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\HttpClientConfig;
 use Superset\Exception\UnexpectedRuntimeException;
 use Superset\Http\Contracts\HttpClientInterface;
 use Superset\Http\HttpClient;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group http
- *
- * @covers \Superset\Http\HttpClient
- */
+#[CoversClass(HttpClient::class)]
+#[Group('unit')]
+#[Group('http')]
 final class HttpClientTest extends BaseTestCase
 {
     private HttpClientConfig $config;
@@ -119,25 +118,25 @@ final class HttpClientTest extends BaseTestCase
 
     public function testHttpMethodCalls(): void
     {
-        $getClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleClient(['status' => 'ok']));
+        $getClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleStub(['status' => 'ok']));
         $this->assertSame(['status' => 'ok'], $getClient->get($this->buildUrl('api/test'), ['param' => 'value']));
 
-        $postClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleClient(['created' => true]));
+        $postClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleStub(['created' => true]));
         $this->assertSame(['created' => true], $postClient->post($this->buildUrl('api/test'), ['data' => 'value']));
 
-        $putClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleClient(['updated' => true]));
+        $putClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleStub(['updated' => true]));
         $this->assertSame(['updated' => true], $putClient->put($this->buildUrl('api/test'), ['data' => 'value']));
 
-        $patchClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleClient(['patched' => true]));
+        $patchClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleStub(['patched' => true]));
         $this->assertSame(['patched' => true], $patchClient->patch($this->buildUrl('api/test'), ['data' => 'value']));
 
-        $deleteClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleClient(['deleted' => true]));
+        $deleteClient = $this->createHttpClientWithMockGuzzle($this->createMockGuzzleStub(['deleted' => true]));
         $this->assertSame(['deleted' => true], $deleteClient->delete($this->buildUrl('api/test')));
     }
 
     public function testRequestBehavior(): void
     {
-        $mockClient = $this->createMockGuzzleClient(['success' => true]);
+        $mockClient = $this->createMockGuzzleStub(['success' => true]);
         $client = $this->createHttpClientWithMockGuzzle($mockClient);
 
         $client->get($this->buildUrl('api/test'));
@@ -154,7 +153,7 @@ final class HttpClientTest extends BaseTestCase
 
     public function testRequestClearsQueryAfterRequest(): void
     {
-        $mockClient = $this->createMockGuzzleClient(['first' => true]);
+        $mockClient = $this->createMockGuzzleStub(['first' => true]);
         $client = $this->createHttpClientWithMockGuzzle($mockClient);
 
         $client->get($this->buildUrl('api/test1'), ['param' => 'value']);
@@ -164,7 +163,7 @@ final class HttpClientTest extends BaseTestCase
 
     public function testRequestHandlesEmptyDataAndCookies(): void
     {
-        $mockClient = $this->createMockGuzzleClient(['created' => true]);
+        $mockClient = $this->createMockGuzzleStub(['created' => true]);
         $client = $this->createHttpClientWithMockGuzzle($mockClient);
 
         $client->post($this->buildUrl('api/test'), []);
@@ -175,7 +174,7 @@ final class HttpClientTest extends BaseTestCase
 
     public function testRequestThrowsExceptionOnGuzzleError(): void
     {
-        $mockClient = $this->createMock(Client::class);
+        $mockClient = $this->createStub(Client::class);
         $mockClient->method('request')
             ->willThrowException(new \GuzzleHttp\Exception\RequestException(
                 'Connection timeout',
@@ -188,6 +187,27 @@ final class HttpClientTest extends BaseTestCase
         $this->expectExceptionMessage('HTTP Request Error: Connection timeout');
 
         $client->get($this->buildUrl('api/test'));
+    }
+
+    private function createMockGuzzleStub(array $responseData, int $statusCode = 200): object
+    {
+        $mockResponse = $this->createStub(Response::class);
+        $mockBody = $this->createStub(\Psr\Http\Message\StreamInterface::class);
+
+        $mockBody->method('getContents')
+            ->willReturn(json_encode($responseData));
+
+        $mockResponse->method('getBody')
+            ->willReturn($mockBody);
+
+        $mockResponse->method('getStatusCode')
+            ->willReturn($statusCode);
+
+        $mockClient = $this->createStub(Client::class);
+        $mockClient->method('request')
+            ->willReturn($mockResponse);
+
+        return $mockClient;
     }
 
     private function createMockGuzzleClient(array $responseData, int $statusCode = 200): object

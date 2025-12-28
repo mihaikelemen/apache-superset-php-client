@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Serializer;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Superset\Config\SerializerConfig;
 use Superset\Dto\Dashboard;
@@ -13,12 +15,9 @@ use Superset\Tests\BaseTestCase;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Serializer;
 
-/**
- * @group unit
- * @group serializer
- *
- * @covers \Superset\Serializer\SerializerService
- */
+#[CoversClass(SerializerService::class)]
+#[Group('unit')]
+#[Group('serializer')]
 final class SerializerServiceTest extends BaseTestCase
 {
     private SerializerService $serializer;

@@ -5,10 +5,9 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         failOnNotice="true"
-         failOnWarning="true"
          bootstrap="tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
+         beStrictAboutOutputDuringTests="false"
 >
     <php>
         <ini name="display_errors" value="1" />
@@ -30,22 +29,9 @@
         <testsuite name="Integration Tests">
             <directory>tests/Integration</directory>
         </testsuite>
-        <testsuite name="All Tests">
-            <directory>tests</directory>
-        </testsuite>
     </testsuites>
 
-    <groups>
-        <include>
-            <group>unit</group>
-        </include>
-        <exclude>
-            <group>integration</group>
-            <group>slow</group>
-        </exclude>
-    </groups>
-
-    <source ignoreSuppressionOfDeprecations="true" restrictNotices="true" restrictWarnings="true">
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
         </include>

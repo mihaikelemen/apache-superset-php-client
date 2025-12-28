@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Service\Component;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\ApiConfig;
 use Superset\Config\SerializerConfig;
 use Superset\Dto\Dashboard;
@@ -14,15 +16,11 @@ use Superset\Serializer\SerializerService;
 use Superset\Service\Component\DashboardService;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group service
- *
- * @covers \Superset\Service\Component\DashboardService
- */
+#[CoversClass(DashboardService::class)]
+#[Group('unit')]
+#[Group('service')]
 final class DashboardServiceTest extends BaseTestCase
 {
-    private HttpClientInterface $httpClient;
     private UrlBuilder $urlBuilder;
     private SerializerService $serializer;
 
@@ -30,14 +28,13 @@ final class DashboardServiceTest extends BaseTestCase
 
     protected function setUp(): void
     {
-        $this->httpClient = $this->createMock(HttpClientInterface::class);
         $this->urlBuilder = new UrlBuilder(self::BASE_URL, new ApiConfig());
         $this->serializer = SerializerService::create(new SerializerConfig());
     }
 
-    private function dashboard(): DashboardService
+    private function dashboard(HttpClientInterface $httpClient): DashboardService
     {
-        return new DashboardService($this->httpClient, $this->urlBuilder, $this->serializer);
+        return new DashboardService($httpClient, $this->urlBuilder, $this->serializer);
     }
 
     public function testIsFinalAndReadonlyClass(): void
@@ -50,6 +47,7 @@ final class DashboardServiceTest extends BaseTestCase
 
     public function testGetReturnsHydratedDashboardWithStringIdentity(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
         $dashboardData = [
             'id' => 123,
             'dashboard_title' => 'Test Dashboard',
@@ -57,13 +55,13 @@ final class DashboardServiceTest extends BaseTestCase
             'published' => true,
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/test-slug'))
             ->willReturn(['result' => $dashboardData]);
 
-        $dashboard = $this->dashboard()->get('test-slug');
+        $dashboard = $this->dashboard($httpClient)->get('test-slug');
 
         $this->assertInstanceOf(Dashboard::class, $dashboard);
         $this->assertSame(123, $dashboard->id);
@@ -73,6 +71,7 @@ final class DashboardServiceTest extends BaseTestCase
 
     public function testGetReturnsHydratedDashboardWithIntIdentity(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
         $dashboardData = [
             'id' => 123,
             'dashboard_title' => 'Another Dashboard',
@@ -80,13 +79,13 @@ final class DashboardServiceTest extends BaseTestCase
             'published' => false,
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/123'))
             ->willReturn(['result' => $dashboardData]);
 
-        $dashboard = $this->dashboard()->get(123);
+        $dashboard = $this->dashboard($httpClient)->get(123);
 
         $this->assertInstanceOf(Dashboard::class, $dashboard);
         $this->assertSame(123, $dashboard->id);
@@ -96,7 +95,9 @@ final class DashboardServiceTest extends BaseTestCase
 
     public function testGetThrowsExceptionWhenResultMissing(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn([]);
@@ -106,12 +107,14 @@ final class DashboardServiceTest extends BaseTestCase
             $this->errorMessage('invalid-id')
         );
 
-        $this->dashboard()->get('invalid-id');
+        $this->dashboard($httpClient)->get('invalid-id');
     }
 
     public function testGetThrowsExceptionWhenResultNotArray(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => 'invalid']);
@@ -121,44 +124,50 @@ final class DashboardServiceTest extends BaseTestCase
             $this->errorMessage(123)
         );
 
-        $this->dashboard()->get(123);
+        $this->dashboard($httpClient)->get(123);
     }
 
     public function testUuidReturnsUuidStringWithIntIdentity(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/123/embedded'))
             ->willReturn(['result' => ['uuid' => self::UUID]]);
 
-        $uuid = $this->dashboard()->uuid(123);
+        $uuid = $this->dashboard($httpClient)->uuid(123);
 
         $this->assertSame(self::UUID, $uuid);
     }
 
     public function testUuidReturnsUuidStringWithStringIdentity(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/test-slug/embedded'))
             ->willReturn(['result' => ['uuid' => self::UUID]]);
 
-        $uuid = $this->dashboard()->uuid('test-slug');
+        $uuid = $this->dashboard($httpClient)->uuid('test-slug');
 
         $this->assertSame(self::UUID, $uuid);
     }
 
     public function testUuidReturnsValidV4Uuid(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard/123/embedded'))
             ->willReturn(['result' => ['uuid' => self::UUID]]);
 
-        $uuid = $this->dashboard()->uuid(123);
+        $uuid = $this->dashboard($httpClient)->uuid(123);
 
         $this->assertMatchesRegularExpression(
             '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
@@ -168,7 +177,9 @@ final class DashboardServiceTest extends BaseTestCase
 
     public function testUuidThrowsExceptionWhenResultMissing(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn([]);
@@ -178,12 +189,14 @@ final class DashboardServiceTest extends BaseTestCase
             $this->errorMessage(123, 'UUID')
         );
 
-        $this->dashboard()->uuid(123);
+        $this->dashboard($httpClient)->uuid(123);
     }
 
     public function testUuidThrowsExceptionWhenUuidMissing(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => []]);
@@ -193,12 +206,14 @@ final class DashboardServiceTest extends BaseTestCase
             $this->errorMessage('slug', 'UUID')
         );
 
-        $this->dashboard()->uuid('slug');
+        $this->dashboard($httpClient)->uuid('slug');
     }
 
     public function testUuidThrowsExceptionWhenUuidNotString(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => ['uuid' => 456]]);
@@ -208,23 +223,25 @@ final class DashboardServiceTest extends BaseTestCase
             $this->errorMessage(123, 'UUID')
         );
 
-        $this->dashboard()->uuid(123);
+        $this->dashboard($httpClient)->uuid(123);
     }
 
     public function testListReturnsArrayOfDashboards(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
         $dashboardsData = [
             ['id' => 1, 'dashboard_title' => 'First', 'slug' => 'first', 'published' => true],
             ['id' => 2, 'dashboard_title' => 'Second', 'slug' => 'second', 'published' => true],
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard'), [])
             ->willReturn(['result' => $dashboardsData]);
 
-        $dashboards = $this->dashboard()->list();
+        $dashboards = $this->dashboard($httpClient)->list();
 
         $this->assertIsArray($dashboards);
         $this->assertCount(2, $dashboards);
@@ -235,19 +252,23 @@ final class DashboardServiceTest extends BaseTestCase
 
     public function testListReturnsEmptyArrayWhenNoResult(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn([]);
 
-        $dashboards = $this->dashboard()->list();
+        $dashboards = $this->dashboard($httpClient)->list();
 
         $this->assertSame([], $dashboards);
     }
 
     public function testListThrowsExceptionWhenResultNotArray(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => 'invalid']);
@@ -257,11 +278,13 @@ final class DashboardServiceTest extends BaseTestCase
             'Invalid dashboards data format received from API'
         );
 
-        $this->dashboard()->list();
+        $this->dashboard($httpClient)->list();
     }
 
     public function testListWithTagParameter(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
         $expectedParams = [
             'q' => \json_encode([
                 'filters' => [
@@ -274,39 +297,45 @@ final class DashboardServiceTest extends BaseTestCase
             ]),
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard'), $expectedParams)
             ->willReturn(['result' => []]);
 
-        $this->dashboard()->list('production');
+        $this->dashboard($httpClient)->list('production');
     }
 
     public function testListWithOnlyPublishedTrue(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard'), ['published' => 'true'])
             ->willReturn(['result' => []]);
 
-        $this->dashboard()->list(null, true);
+        $this->dashboard($httpClient)->list(null, true);
     }
 
     public function testListWithOnlyPublishedFalse(): void
     {
-        $this->httpClient
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard'), ['published' => 'false'])
             ->willReturn(['result' => []]);
 
-        $this->dashboard()->list(null, false);
+        $this->dashboard($httpClient)->list(null, false);
     }
 
     public function testListWithBothTagAndPublished(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
         $expectedParams = [
             'q' => \json_encode([
                 'filters' => [
@@ -320,17 +349,19 @@ final class DashboardServiceTest extends BaseTestCase
             'published' => 'true',
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->with($this->buildUrl('api/v1/dashboard'), $expectedParams)
             ->willReturn(['result' => []]);
 
-        $this->dashboard()->list('test', true);
+        $this->dashboard($httpClient)->list('test', true);
     }
 
     public function testListSkipsNonArrayItems(): void
     {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+
         $dashboardsData = [
             ['id' => 1, 'dashboard_title' => 'First', 'slug' => 'first'],
             'invalid-item',
@@ -339,12 +370,12 @@ final class DashboardServiceTest extends BaseTestCase
             ['id' => 3, 'dashboard_title' => 'Third', 'slug' => 'third'],
         ];
 
-        $this->httpClient
+        $httpClient
             ->expects($this->once())
             ->method('get')
             ->willReturn(['result' => $dashboardsData]);
 
-        $dashboards = $this->dashboard()->list();
+        $dashboards = $this->dashboard($httpClient)->list();
 
         $this->assertCount(3, $dashboards);
         $this->assertSame('First', $dashboards[0]->title);

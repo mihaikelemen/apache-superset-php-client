@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Dto;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\SerializerConfig;
 use Superset\Dto\Dashboard;
 use Superset\Serializer\SerializerService;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group dto
- *
- * @covers \Superset\Dto\Dashboard
- */
+#[CoversClass(Dashboard::class)]
+#[Group('unit')]
+#[Group('dto')]
 final class DashboardTest extends BaseTestCase
 {
     private SerializerService $serializer;

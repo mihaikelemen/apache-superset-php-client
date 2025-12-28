@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Superset\Tests\Unit\Config;
 
 use Monolog\Level;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\LoggerConfig;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group config
- *
- * @covers \Superset\Config\LoggerConfig
- */
+#[CoversClass(LoggerConfig::class)]
+#[Group('unit')]
+#[Group('config')]
 final class LoggerConfigTest extends BaseTestCase
 {
     public function testConstructorWithDefaultValues(): void

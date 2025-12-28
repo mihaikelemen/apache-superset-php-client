@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Enum;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Enum\HttpStatusCode;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group enum
- *
- * @covers \Superset\Enum\HttpStatusCode
- */
+#[CoversClass(HttpStatusCode::class)]
+#[Group('unit')]
+#[Group('enum')]
 final class HttpStatusCodeTest extends BaseTestCase
 {
     public function testIsBackedEnum(): void

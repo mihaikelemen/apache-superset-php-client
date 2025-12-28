@@ -7,17 +7,16 @@ namespace Superset\Tests\Unit\Service;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Superset\Config\LoggerConfig;
 use Superset\Service\LoggerService;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group service
- *
- * @covers \Superset\Service\LoggerService
- */
+#[CoversClass(LoggerService::class)]
+#[Group('unit')]
+#[Group('service')]
 final class LoggerServiceTest extends BaseTestCase
 {
     private string $logPath;

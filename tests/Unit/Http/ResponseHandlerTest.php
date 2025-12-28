@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Http;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Exception\HttpResponseException;
 use Superset\Exception\JsonDecodeException;
 use Superset\Http\ResponseHandler;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group http
- *
- * @covers \Superset\Http\ResponseHandler
- */
+#[CoversClass(ResponseHandler::class)]
+#[Group('unit')]
+#[Group('http')]
 final class ResponseHandlerTest extends BaseTestCase
 {
     private ResponseHandler $handler;

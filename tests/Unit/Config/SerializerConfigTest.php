@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Superset\Tests\Unit\Config;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Superset\Config\SerializerConfig;
 use Superset\Tests\BaseTestCase;
 
-/**
- * @group unit
- * @group config
- *
- * @covers \Superset\Config\SerializerConfig
- */
+#[CoversClass(SerializerConfig::class)]
+#[Group('unit')]
+#[Group('config')]
 final class SerializerConfigTest extends BaseTestCase
 {
     public function testConstructorWithDefaultValues(): void
